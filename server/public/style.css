@@ -113,3 +113,23 @@ body { font-family: Arial, sans-serif; background: #1a1a2e; color: white; height
   from { transform: translateX(100px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+.slogan {
+  text-align: center;
+  font-size: 12px;
+  color: #aaa;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #0f3460;
+  color: #aaa;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  z-index: 100;
+}
