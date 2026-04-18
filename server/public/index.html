@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SNConnect</title>
   <link rel="stylesheet" href="style.css">
-</head>
 </head>
 <body>
 
 <!-- HALAMAN LOGIN/REGISTER -->
 <div id="auth-page">
   <div class="auth-box">
-    <h2>💬 SNConnect</h2>
-    <br>
+    <img src="LOGO SNConnect.png" alt="SNConnect Logo" class="logo-auth">
+    <h2>SNConnect</h2>
     <p class="slogan">Ruang Diskusi & Kolaborasi Kelas IT</p>
 
     <div class="tab-buttons">
@@ -43,7 +41,8 @@
 <!-- HALAMAN CHAT -->
 <div id="chat-page" style="display:none">
   <div class="sidebar">
-    <h3>💬 SNConnect</h3>
+    <img src="LOGO SNConnect.png" alt="SNConnect Logo" class="logo-sidebar">
+    <h3>SNConnect</h3>
     <button onclick="joinRoom('general')" class="room-btn">🌐 General</button>
     <button onclick="joinRoom('random')" class="room-btn">🎲 Random</button>
     <button onclick="joinRoom('tech')" class="room-btn">💻 Tech</button>
@@ -58,22 +57,22 @@
     </div>
     <div id="messages"></div>
     <div id="reply-preview" style="display:none">
-     <span id="reply-text"></span>
+      <span id="reply-text"></span>
       <button onclick="cancelReply()">✕</button>
     </div>
     <div class="input-area">
-      <input type="text" id="msg-input" placeholder="Ketik pesan..." 
+      <input type="text" id="msg-input" placeholder="Ketik pesan..."
              onkeypress="if(event.key==='Enter') sendMessage()">
       <button onclick="sendMessage()">Kirim</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script src="script.js"></script>
-
 <div class="footer">
   SNConnect © 2026 | Engineered by Salmaa | Concept by Nayla
 </div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
