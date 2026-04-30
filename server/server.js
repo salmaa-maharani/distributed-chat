@@ -25,7 +25,6 @@ app.get('/', (req, res) => {
 app.post('/register', (req, res) => {
   const { username, password } = req.body;
   const hashed = bcrypt.hashSync(password, 10);
-
   db.query(
     'INSERT INTO users (username, password) VALUES (?, ?)',
     [username, hashed],
@@ -41,18 +40,15 @@ app.post('/register', (req, res) => {
 // =====================
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
-
   db.query(
     'SELECT * FROM users WHERE username = ?',
     [username],
     (err, results) => {
       if (err || results.length === 0)
         return res.json({ success: false, message: 'User tidak ditemukan!' });
-
       const valid = bcrypt.compareSync(password, results[0].password);
       if (!valid)
         return res.json({ success: false, message: 'Password salah!' });
-
       res.json({ success: true, username });
     }
   );
@@ -86,21 +82,34 @@ io.on('connection', (socket) => {
 
   socket.on('send_message', (data) => {
     const { username, message, room, replyTo } = data;
-
-    // Simpan ke database
     db.query(
       'INSERT INTO messages (username, message, room) VALUES (?, ?, ?)',
-      [username, message, room]
+      [username, message, room],
+      (err, result) => {
+        if (err) return;
+        io.to(room).emit('receive_message', {
+          id: result.insertId,
+          username,
+          message,
+          room,
+          replyTo,
+          created_at: new Date()
+        });
+      }
     );
+  });
 
-    // Kirim ke semua user di room
-    io.to(room).emit('receive_message', {
-      username,
-      message,
-      room,
-      replyTo,
-      created_at: new Date()
-    });
+  socket.on('delete_message', (data) => {
+    const { id, username, room } = data;
+    db.query(
+      'DELETE FROM messages WHERE id = ? AND username = ?',
+      [id, username],
+      (err, result) => {
+        if (!err && result.affectedRows > 0) {
+          io.to(room).emit('message_deleted', { id });
+        }
+      }
+    );
   });
 
   socket.on('disconnect', () => {

@@ -85,7 +85,7 @@ async function joinRoom(room) {
   event.target && event.target.classList.add('active');
   const res = await fetch(`${SERVER}/messages/${room}`);
   const messages = await res.json();
-  messages.forEach(m => displayMessage(m.username, m.message, m.created_at, null));
+  messages.forEach(m => displayMessage(m.username, m.message, m.created_at, null, m.id));
 }
 
 function sendMessage() {
@@ -113,12 +113,26 @@ function cancelReply() {
   document.getElementById('reply-preview').style.display = 'none';
 }
 
+function deleteMessage(id) {
+  if (!confirm('Hapus pesan ini?')) return;
+  socket.emit('delete_message', {
+    id,
+    username: currentUser,
+    room: currentRoom
+  });
+}
+
+socket.on('message_deleted', (data) => {
+  const msg = document.querySelector(`[data-id="${data.id}"]`);
+  if (msg) msg.remove();
+});
+
 socket.on('receive_message', (data) => {
   if (data.username !== currentUser) {
     playNotifSound();
     showInAppNotif(data.username, data.message);
   }
-  displayMessage(data.username, data.message, data.created_at, data.replyTo);
+  displayMessage(data.username, data.message, data.created_at, data.replyTo, data.id);
 });
 
 function playNotifSound() {
@@ -136,9 +150,10 @@ function playNotifSound() {
   oscillator.stop(ctx.currentTime + 0.3);
 }
 
-function displayMessage(username, message, time, replyTo) {
+function displayMessage(username, message, time, replyTo, msgId) {
   const div = document.createElement('div');
   div.className = 'message ' + (username === currentUser ? 'mine' : 'others');
+  if (msgId) div.setAttribute('data-id', msgId);
   const t = new Date(time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   let replyHTML = '';
   if (replyTo) {
@@ -150,7 +165,10 @@ function displayMessage(username, message, time, replyTo) {
     <div class="msg-text">${message}</div>
     <div class="time-reply">
       <span class="time">${t}</span>
-      <button class="reply-btn" onclick="setReply('${username}', '${message}')">↩ Reply</button>
+      <div class="msg-actions">
+        <button class="reply-btn" onclick="setReply('${username}', '${message}')">↩ Reply</button>
+        ${username === currentUser && msgId ? `<button class="delete-btn" onclick="deleteMessage(${msgId})">🗑️</button>` : ''}
+      </div>
     </div>
   `;
   document.getElementById('messages').appendChild(div);
